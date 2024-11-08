@@ -3,16 +3,15 @@ package store
 import java.io.File
 import java.nio.file.Paths
 
-fun readFileProducts(path: String): MutableList<MutableList<String>> {
+fun readFile(path: String): MutableList<MutableList<String>> {
     val projectAbsolutePath = Paths.get("").toAbsolutePath().toString()
     val fileAbsolutePath = "${projectAbsolutePath}/src/main/resources/${path}"
 
-    val products = mutableListOf<MutableList<String>>()
+    val result = mutableListOf<MutableList<String>>()
     File(fileAbsolutePath).forEachLine {
-        val (name, price, quantity, promotion) = it.split(",")
-        products.add(mutableListOf(name, price, quantity, promotion))
+        result.add(it.split(",").toMutableList())
     }
-    products.removeAt(0)
+    result.removeAt(0)
 
-    return products
+    return result
 }
