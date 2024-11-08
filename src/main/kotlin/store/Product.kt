@@ -1,10 +1,14 @@
 package store
 
 // 상품
-class Product(private var name: String, private var quantity: Int) {
+class Product(private var name: String, private var quantity: Int, private val price: Int) {
 
     fun getName(): String {
         return name
+    }
+
+    fun getPrice(): Int {
+        return price
     }
 
     fun getQuantity(): Int {
