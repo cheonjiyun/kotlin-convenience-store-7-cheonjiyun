@@ -76,6 +76,14 @@ class ApplicationTest : NsTest() {
     }
 
     @Test
+    fun `증정 가능하면 구매목록에 추가`(){
+        assertNowTest({
+            run("[콜라-5]", "Y", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("콜라6")
+        }, LocalDate.of(2024, 2, 1).atStartOfDay())
+    }
+
+    @Test
     fun `예외 테스트`() {
         assertSimpleTest {
             runException("[컵라면-12]", "N", "N")
