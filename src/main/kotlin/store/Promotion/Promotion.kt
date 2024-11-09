@@ -39,7 +39,10 @@ class Promotion(
         val today = Date()
 
         return startDate < today && today < endDate
+    }
 
+    fun howGetQuantity(quantity : Int): Int {
+        return (quantity / buy) * get
     }
 
 }

@@ -39,19 +39,25 @@ class BuyController(private val promotions: List<Promotion>, private var product
         }
     }
 
-    private fun checkAddPromotion() : Boolean {
+    private fun checkAddPromotion(): Boolean {
 
         return false
     }
 
-    private fun applyPromotion(buyProduct: BuyProduct){
+    private fun applyPromotion(buyProduct: BuyProduct) {
         // 몇개 증정하는지
-        val promotion =  promotions.find { buyProduct.promotion?.getName() == it.getName() }
+        val promotion = promotions.find { buyProduct.promotion?.getName() == it.getName() }
 
-        println(promotion?.canApplyPromotion())
-
-
-        promotionList.addLast(buyProduct)
+        if (promotion?.canApplyPromotion() == true) {
+            promotionList.addLast(
+                BuyProduct(
+                    buyProduct.name,
+                    buyProduct.price,
+                    promotion.howGetQuantity(buyProduct.quantity),
+                    promotion
+                )
+            )
+        }
     }
 
     private fun checkPromotion(buyProduct: BuyProduct) {
@@ -130,6 +136,6 @@ class BuyController(private val promotions: List<Promotion>, private var product
         buyProducts()
 
         println(membershipDiscount)
-        outputView.printReceipt(buyList, totalPrice, promotionDiscount, membershipDiscount)
+        outputView.printReceipt(buyList, promotionList, totalPrice, promotionDiscount, membershipDiscount)
     }
 }

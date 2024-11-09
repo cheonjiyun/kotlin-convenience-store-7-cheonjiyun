@@ -15,13 +15,16 @@ class OutputView {
         println("- 콜라 1,000원 10개 탄산2+1")
     }
 
-    fun printReceipt(buyList : List<BuyProduct>, totalPrice: Int, promotionDiscount: Int, membershipDiscount: Int) {
+    fun printReceipt(buyList : List<BuyProduct>, promotionList : MutableList<BuyProduct>, totalPrice: Int, promotionDiscount: Int, membershipDiscount: Int) {
         println("==============W 편의점================")
         println("상품명\t\t수량\t금액")
         buyList.forEach {
-            println("${it.name}\t\t${it.quantity} \t${dec.format(it.price)}")
+            println("${it.name}\t\t${it.quantity} \t${dec.format(it.price * it.quantity)}")
         }
         println("=============증\t정===============")
+        promotionList.forEach {
+            println("${it.name}\t\t${it.quantity}")
+        }
 //        println("오렌지주스\t\t1")
         println("====================================")
         println("총구매액\t\t2\t${dec.format(totalPrice)}")
