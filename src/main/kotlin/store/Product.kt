@@ -1,7 +1,7 @@
 package store
 
 // 상품
-class Product(private var name: String, private var quantity: Int, private val price: Int) {
+class Product(private var name: String, private val price: Int, private var quantity: Int, private var promotion: String) {
 
     fun getName(): String {
         return name
@@ -9,6 +9,10 @@ class Product(private var name: String, private var quantity: Int, private val p
 
     fun getPrice(): Int {
         return price
+    }
+
+    fun getPromotion() : String{
+        return promotion
     }
 
     fun getQuantity(): Int {
