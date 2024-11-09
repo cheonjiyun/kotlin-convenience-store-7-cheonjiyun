@@ -70,7 +70,9 @@ class BuyController(private val promotions: List<Promotion>, private var product
 
     private fun checkMemberShip() {
         val notPromotionPrice =
-            buyList.filter { it.promotion == null }.map { it.quantity * it.price }.reduce { acc, it -> acc + it }
+            buyList.filter { it.promotion == null }.map { it.quantity * it.price }.reduceOrNull { acc, it -> acc + it}
+
+        if(notPromotionPrice == null) return
 
         membershipDiscount = (notPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).toInt()
     }
