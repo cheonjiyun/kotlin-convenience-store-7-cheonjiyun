@@ -25,7 +25,6 @@ class OutputView {
         promotionList.forEach {
             println("${it.name}\t\t${it.quantity}")
         }
-//        println("오렌지주스\t\t1")
         println("====================================")
         println("총구매액\t\t2\t${dec.format(totalPrice)}")
         println("행사할인\t\t\t-${dec.format(promotionDiscount)}")

@@ -5,6 +5,6 @@ import store.Promotion.Promotion
 data class BuyProduct(
     val name: String,
     val price: Int,
-    val quantity: Int,
+    var quantity: Int,
     val promotion: Promotion?
 )
