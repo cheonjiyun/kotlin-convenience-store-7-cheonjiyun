@@ -1,5 +1,6 @@
 package store.Buy
 
+import store.Product.BuyInputProduct
 import store.Product.BuyProduct
 import store.Product.Product
 import store.Promotion.Promotion
@@ -11,7 +12,7 @@ val MEMBERSHIP_DISCOUNT_RATE = 0.3
 class BuyController(private val promotions: List<Promotion>, private var products: List<Product>) {
     private val inputView = InputView()
 
-    private lateinit var buyList: List<Product>
+    private lateinit var buyList: List<BuyProduct>
     private var totalPrice = 0
     private var promotionDiscount = 1000
     private var membershipDiscount = 0
@@ -25,17 +26,17 @@ class BuyController(private val promotions: List<Promotion>, private var product
         return products.find { it.getName() == productName }
     }
 
-    private fun removeNoPromotion(buyProduct : BuyProduct){
+    private fun removeNoPromotion(buyProduct: BuyInputProduct) {
         buyProduct.quantity
     }
 
-    private fun checkRemoveNoPromotion(buyProduct : BuyProduct){
-        if(inputView.notPromotion()){
+    private fun checkRemoveNoPromotion(buyProduct: BuyInputProduct) {
+        if (inputView.notPromotion()) {
             removeNoPromotion(buyProduct)
         }
     }
 
-    private fun checkPromotion(buyProduct: BuyProduct) {
+    private fun checkPromotion(buyProduct: BuyInputProduct) {
         val storeProduct = findProduct(buyProduct.name) ?: return
         val promotion = storeProduct.getPromotion()?.let { findPromotion(it.getName()) }
 
@@ -45,29 +46,25 @@ class BuyController(private val promotions: List<Promotion>, private var product
 
         println(storeProduct.canBuyQuantity(buyProduct.quantity))
         // 프로모션 재고가 있는가
-        if(storeProduct.canBuyQuantity(buyProduct.quantity)){
+        if (storeProduct.canBuyQuantity(buyProduct.quantity)) {
             // 프로모션보다 작게 가져온 경우
-        }else{
+        } else {
             // 못받아도 구매할건지
             checkRemoveNoPromotion(buyProduct)
         }
 
     }
 
-    private fun checkPromotions(buyList: List<BuyProduct>) {
+    private fun checkPromotions(buyList: List<BuyInputProduct>) {
         buyList.forEach { buyProduct ->
             checkPromotion(buyProduct)
         }
     }
 
     private fun calculateTotalPrice() {
-//        val prices =
-//            buyList.map { buyProduct ->
-//                val price = products.find { product -> buyProduct.name == product.getName() }?.getPrice()
-//                price?.times(buyProduct.quantity) ?: 0
-//            }
-//
-//        totalPrice = prices.reduce { acc, it -> acc + it }
+        totalPrice = buyList.map { buyProduct ->
+            buyProduct.price * buyProduct.quantity
+        }.reduce { acc, it -> acc + it }
     }
 
     private fun checkMemberShip() {
@@ -79,9 +76,9 @@ class BuyController(private val promotions: List<Promotion>, private var product
     fun buyStart() {
         val buyInputList = inputView.readItem()
         buyList = buyInputList.mapNotNull { buyInput ->
-            findProduct(buyInput.name)
+            val product = findProduct(buyInput.name) ?: return@mapNotNull null
+            BuyProduct(buyInput.name, product.getPrice(), buyInput.quantity, product.getPromotion())
         }
-
 
         calculateTotalPrice()
 //

@@ -1,7 +1,7 @@
 package store.View
 
 import camp.nextstep.edu.missionutils.Console
-import store.Product.BuyProduct
+import store.Product.BuyInputProduct
 import java.util.*
 
 class InputView {
@@ -10,13 +10,13 @@ class InputView {
         return Console.readLine()
     }
 
-    fun readItem(): List<BuyProduct> {
+    fun readItem(): List<BuyInputProduct> {
         println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])")
         val input = input().split(',')
 
         return input.map {
             val (name, quantity) = it.split('-')
-            BuyProduct(name, quantity.toInt())
+            BuyInputProduct(name, quantity.toInt())
         }
     }
 
