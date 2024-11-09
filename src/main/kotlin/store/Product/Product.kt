@@ -27,7 +27,7 @@ class Product(private var name: String, private val price: Int, private var quan
     }
 
     fun canBuyQuantity(quantity: Int): Boolean {
-        return quantity > this.quantity
+        return quantity < this.quantity
     }
 
     private fun checkCanBuyQuantity(quantity: Int) {
