@@ -9,11 +9,11 @@ class InputView {
         return Console.readLine()
     }
 
-    fun readItem(): String {
+    fun readItem(): List<List<String>> {
         println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])")
-        val input = input()
+        val input = input().split(',')
 
-        return input
+        return input.map { it.split('-') }
     }
 
     fun isReBuy(): Boolean {

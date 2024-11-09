@@ -1,4 +1,4 @@
-package store
+package store.Promotion
 
 class Promotion(
     private val name: String,

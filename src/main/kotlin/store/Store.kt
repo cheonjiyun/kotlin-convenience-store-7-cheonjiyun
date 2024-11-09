@@ -1,6 +1,7 @@
 package store
 
-import store.Controller.BuyController
+import store.Promotion.checkPromotion
+import store.Promotion.Promotion
 import store.View.InputView
 
 class Store {
@@ -29,18 +30,21 @@ class Store {
     }
 
     private fun visitCustomer() {
-        while (true) {
-            inputView.readItem()
-            val buyController = BuyController()
-            buyController.start()
+        val buyList = inputView.readItem()
+//        checkPromotion()
+//        buyList.forEach {
+//
+//        }
 
-            if (!inputView.isReBuy()) break
-        }
     }
 
     fun open() {
         saveStock()
-        visitCustomer()
+
+        while (true) {
+            visitCustomer()
+            if (!inputView.isReBuy()) break
+        }
     }
 
 }
