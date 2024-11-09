@@ -39,7 +39,7 @@ class Store {
         saveStock()
 
         while (true) {
-            val buyController = BuyController()
+            val buyController = BuyController(promotions, products)
             buyController.buyStart()
             if (!inputView.isReBuy()) break
         }
