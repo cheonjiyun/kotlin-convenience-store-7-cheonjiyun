@@ -1,5 +1,6 @@
 package store.Product
 
+import store.Enum.Error
 import store.Promotion.Promotion
 
 // 상품
@@ -27,12 +28,12 @@ class Product(private var name: String, private val price: Int, private var quan
     }
 
     fun canBuyQuantity(quantity: Int): Boolean {
-        return quantity < this.quantity
+        return quantity <= this.quantity
     }
 
     private fun checkCanBuyQuantity(quantity: Int) {
         if (!canBuyQuantity(quantity)) {
-            throw IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.")
+            throw IllegalArgumentException(Error.EXCEED_QUANTITY.errorMessage)
         }
     }
 }

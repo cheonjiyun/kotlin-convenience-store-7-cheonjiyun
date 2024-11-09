@@ -1,6 +1,6 @@
 package store.Buy
 
-import store.Product.BuyInputProduct
+import store.Enum.Error
 import store.Product.BuyProduct
 import store.Product.Product
 import store.Promotion.Promotion
@@ -21,28 +21,54 @@ class BuyController(private val promotions: List<Promotion>, private var product
     private var membershipDiscount = 0
 
 
-    private fun findPromotion(promotionName: String): Promotion? {
+    private fun findPromotion(promotionName: String): Promotion {
         return promotions.find { it.getName() == promotionName }
+            ?: throw IllegalStateException(Error.CANT_FIND_PROMOTION.errorMessage)
     }
 
-    private fun findProduct(productName: String): Product? {
+    private fun findProduct(productName: String): Product {
         return products.find { it.getName() == productName }
+            ?: throw IllegalStateException(Error.CANT_FIND_PRODUCT.errorMessage)
+    }
+
+    private fun findGeneralProduct(productName: String): Product? {
+        return products.find { it.getName() == productName && it.getPromotion() == null }
     }
 
     private fun removeNoPromotion(buyProduct: BuyProduct) {
-        val product = findProduct(buyProduct.name) ?: throw IllegalStateException("해당 상품이 없습니다")
-        buyProduct.quantity -= product.getQuantity()
+        val product = findProduct(buyProduct.name)
+        buyProduct.quantity = product.getQuantity()
     }
 
-    private fun checkRemoveNoPromotion(buyProduct: BuyProduct) {
-        if (!inputView.isBuyNotPromotion()) {
-            removeNoPromotion(buyProduct)
+    private fun checkRemoveNoPromotion(buyProduct: BuyProduct, storeProduct: Product) {
+        if (!inputView.isBuyNotPromotion(buyProduct.name, buyProduct.quantity - storeProduct.getQuantity())) {
+//            removeNoPromotion(buyProduct)
         }
     }
 
-    private fun checkAddPromotion(): Boolean {
+
+    private fun addPromotion(buyProduct: BuyProduct) {
+        val promotion = findPromotion(buyProduct.promotion!!.getName())
+        buyProduct.quantity += promotion.getGet()
+
+    }
+
+    private fun isCanAddPromotion(buyProduct: BuyProduct): Boolean {
+        val promotion = findPromotion(buyProduct.promotion!!.getName())
+        val product = findProduct(buyProduct.name)
+
+        if (product.getQuantity() == buyProduct.quantity) return false
+        if (buyProduct.quantity == promotion.getBuy()) return true
+        if (buyProduct.quantity % (promotion.getBuy() + promotion.getGet()) == promotion.getBuy()) return true
 
         return false
+    }
+
+    private fun checkAddPromotion(buyProduct: BuyProduct) {
+        if (isCanAddPromotion(buyProduct) && inputView.canGetPromotion(buyProduct.name)) {
+            // 프로모션보다 작게 가져온 경우
+            addPromotion(buyProduct)
+        }
     }
 
     private fun calculatePromotion() {
@@ -53,39 +79,44 @@ class BuyController(private val promotions: List<Promotion>, private var product
     private fun applyPromotion(buyProduct: BuyProduct) {
         // 몇개 증정하는지
         val promotion = promotions.find { buyProduct.promotion?.getName() == it.getName() }
-        val product = findProduct(buyProduct.name) ?: throw IllegalStateException("해당 상품이 없습니다")
-        val canPromotionQuantity = if(product.getQuantity() > buyProduct.quantity) buyProduct.quantity else product.getQuantity()
+        val product = findProduct(buyProduct.name)
+        val canPromotionQuantity =
+            if (product.getQuantity() > buyProduct.quantity) buyProduct.quantity else product.getQuantity()
 
         if (promotion?.canApplyPromotion() == true) {
-            promotionList.addLast(
-                BuyProduct(
-                    buyProduct.name,
-                    buyProduct.price,
-                    promotion.howGetQuantity(canPromotionQuantity),
-                    promotion
+            try {
+                // 프로모션 재고는 있는데, 증정수량+구매수량 만큼은 없음
+//                if (promotion.howGetQuantity(canPromotionQuantity) + buyProduct.quantity > product.getQuantity()) throw IllegalStateException(
+//                    Error.EXCEED_QUANTITY.errorMessage
+//                )
+                // 증정 적용
+                promotionList.addLast(
+                    BuyProduct(
+                        buyProduct.name,
+                        buyProduct.price,
+                        promotion.howGetQuantity(canPromotionQuantity),
+                        promotion
+                    )
                 )
-            )
+            } catch (e: IllegalStateException) {
+                println(e.message)
+            }
         }
     }
 
     private fun checkPromotion(buyProduct: BuyProduct) {
-        val storeProduct = findProduct(buyProduct.name) ?: return
+        val storeProduct = findProduct(buyProduct.name)
         val promotion = storeProduct.getPromotion()?.let { findPromotion(it.getName()) }
 
         // 해당 상품이 프로모션인가
         if (promotion == null) return
 
-        // 프로모션 재고가 있는가
         if (storeProduct.canBuyQuantity(buyProduct.quantity)) {
-//            // 프로모션보다 작게 가져온 경우
-//            if(checkAddPromotion()){
-//
-//            }
-
-
+            // 프로모션받을 수 있는지
+            checkAddPromotion(buyProduct)
         } else {
             // 못받아도 구매할건지
-            checkRemoveNoPromotion(buyProduct)
+            checkRemoveNoPromotion(buyProduct, storeProduct)
         }
 
         applyPromotion(buyProduct)
@@ -113,10 +144,22 @@ class BuyController(private val promotions: List<Promotion>, private var product
         membershipDiscount = (notPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).toInt()
     }
 
+    private fun buyProduct(buyProduct: BuyProduct) {
+        val product = findProduct(buyProduct.name)
+        val howCanBuyQuantity =
+            if (product.getQuantity() > buyProduct.quantity) buyProduct.quantity else product.getQuantity()
+        findProduct(buyProduct.name).buy(howCanBuyQuantity)
+
+        //프로모션이 없어서 일반상품으로 나머지 결제
+        if (howCanBuyQuantity != buyProduct.quantity) {
+            findGeneralProduct(buyProduct.name)?.buy(buyProduct.quantity - howCanBuyQuantity)
+        }
+    }
+
     private fun buyProducts() {
         try {
-            buyList.forEach {
-                findProduct(it.name)?.buy(it.quantity)
+            buyList.forEach { buyProduct ->
+                buyProduct(buyProduct)
             }
         } catch (e: IllegalArgumentException) {
             println(e.message)
@@ -124,8 +167,8 @@ class BuyController(private val promotions: List<Promotion>, private var product
     }
 
     private fun inputBuyList() {
-        buyList = inputView.readItem().mapNotNull { buyInput ->
-            val product = findProduct(buyInput.name) ?: return@mapNotNull null
+        buyList = inputView.readItem().map { buyInput ->
+            val product = findProduct(buyInput.name)
             BuyProduct(buyInput.name, product.getPrice(), buyInput.quantity, product.getPromotion())
         }
     }
@@ -134,7 +177,6 @@ class BuyController(private val promotions: List<Promotion>, private var product
         outputView.printProducts(products)
 
         inputBuyList()
-        calculateTotalPrice()
 
         checkPromotions()
         calculatePromotion()
@@ -145,6 +187,7 @@ class BuyController(private val promotions: List<Promotion>, private var product
 
         buyProducts()
 
+        calculateTotalPrice()
         outputView.printReceipt(buyList, promotionList, totalPrice, promotionDiscount, membershipDiscount)
     }
 }

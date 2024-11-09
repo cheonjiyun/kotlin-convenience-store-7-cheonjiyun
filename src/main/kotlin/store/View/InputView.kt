@@ -37,9 +37,14 @@ class InputView {
         return input.uppercase(Locale.getDefault()) == "Y"
     }
 
+    fun canGetPromotion(productName: String): Boolean {
+        println("현재 ${productName}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)")
+        val input = input()
+        return input.uppercase(Locale.getDefault()) == "Y"
+    }
 
-    fun isBuyNotPromotion(): Boolean {
-        println("현재 콜라 4개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)")
+    fun isBuyNotPromotion(productName: String, quantity: Int): Boolean {
+        println("현재 $productName ${quantity}개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)")
         val input = input()
         return input.uppercase(Locale.getDefault()) == "Y"
     }

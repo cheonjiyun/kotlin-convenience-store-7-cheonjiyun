@@ -26,7 +26,8 @@ class OutputView {
             println("${it.name}\t\t${it.quantity}")
         }
         println("====================================")
-        println("총구매액\t\t2\t${dec.format(totalPrice)}")
+        val totalQuantity = buyList.map { it.quantity}.reduce { acc, i -> acc + i  }
+        println("총구매액\t\t$totalQuantity\t${dec.format(totalPrice)}")
         println("행사할인\t\t\t-${dec.format(promotionDiscount)}")
         println("멤버십할인\t\t\t-${dec.format(membershipDiscount)}")
         println("내실돈\t\t\t ${dec.format(totalPrice - promotionDiscount - membershipDiscount)}")
