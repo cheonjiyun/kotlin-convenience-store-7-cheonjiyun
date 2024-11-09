@@ -36,10 +36,26 @@ class ApplicationTest : NsTest() {
     }
 
     @Test
+    fun`일반 상품 한개 구매`(){
+        assertSimpleTest {
+            run("[비타민워터-3]", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈4,500")
+        }
+    }
+
+    @Test
     fun `여러 개의 일반 상품 구매`() {
         assertSimpleTest {
             run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "N")
             assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈18,300")
+        }
+    }
+
+    @Test
+    fun `멤버십을 할인을 받는 여러 개의 일반 상품 구매`() {
+        assertSimpleTest {
+            run("[비타민워터-3],[물-2],[정식도시락-2]", "Y", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("멤버십할인-5,490","내실돈12,810")
         }
     }
 
