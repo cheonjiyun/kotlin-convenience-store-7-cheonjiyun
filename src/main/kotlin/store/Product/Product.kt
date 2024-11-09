@@ -1,7 +1,9 @@
-package store
+package store.Product
+
+import store.Promotion.Promotion
 
 // 상품
-class Product(private var name: String, private val price: Int, private var quantity: Int, private var promotion: String) {
+class Product(private var name: String, private val price: Int, private var quantity: Int, private var promotion: Promotion?) {
 
     fun getName(): String {
         return name
@@ -11,7 +13,7 @@ class Product(private var name: String, private val price: Int, private var quan
         return price
     }
 
-    fun getPromotion() : String{
+    fun getPromotion() : Promotion? {
         return promotion
     }
 

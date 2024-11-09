@@ -1,4 +1,4 @@
-package store
+package store.Util
 
 import java.io.File
 import java.nio.file.Paths

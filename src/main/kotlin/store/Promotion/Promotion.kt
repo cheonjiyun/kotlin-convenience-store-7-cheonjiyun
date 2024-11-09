@@ -8,4 +8,8 @@ class Promotion(
     private val end_date: String
 ) {
 
+    fun getName(): String {
+        return name
+    }
+
 }

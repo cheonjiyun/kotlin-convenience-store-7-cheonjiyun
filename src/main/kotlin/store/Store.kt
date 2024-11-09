@@ -1,7 +1,9 @@
 package store
 
-import store.Promotion.checkPromotion
+import store.Buy.BuyController
+import store.Product.Product
 import store.Promotion.Promotion
+import store.Util.readFile
 import store.View.InputView
 
 class Store {
@@ -11,8 +13,11 @@ class Store {
 
     private fun getProducts(): List<Product> {
         return readFile("products.md").map {
-            val (name, price, quantity, promotion) = it
-            Product(name, price.toInt(), quantity.toInt(), promotion)
+            val (name, price, quantity, promotionInput) = it
+
+            Product(name, price.toInt(), quantity.toInt(), promotions.find { promotionItem ->
+                promotionItem.getName() == promotionInput
+            })
         }
     }
 
@@ -25,24 +30,17 @@ class Store {
 
 
     private fun saveStock() {
-        products = getProducts()
         promotions = getPromotion()
+        products = getProducts()
     }
 
-    private fun visitCustomer() {
-        val buyList = inputView.readItem()
-//        checkPromotion()
-//        buyList.forEach {
-//
-//        }
-
-    }
 
     fun open() {
         saveStock()
 
         while (true) {
-            visitCustomer()
+            val buyController = BuyController()
+            buyController.buyStart()
             if (!inputView.isReBuy()) break
         }
     }
