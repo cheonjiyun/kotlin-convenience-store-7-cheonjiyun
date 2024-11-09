@@ -1,12 +1,17 @@
 package store.View
 
 import store.Product.BuyProduct
+import store.Product.Product
 import java.text.DecimalFormat
 
 class OutputView {
     val dec = DecimalFormat("#,###")
 
-    fun printProducts() {
+    fun printProducts(products: List<Product>) {
+        products.forEach {
+            val price = if(it.getQuantity() == 0) "재고 없음" else "${it.getQuantity()}개"
+            println("- ${it.getName()} ${dec.format(it.getPrice())}원 $price ${it.getPromotion()?.getName() ?: ""}")
+        }
         println("- 콜라 1,000원 10개 탄산2+1")
     }
 

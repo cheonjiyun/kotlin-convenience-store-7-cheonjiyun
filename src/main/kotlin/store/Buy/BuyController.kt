@@ -45,7 +45,6 @@ class BuyController(private val promotions: List<Promotion>, private var product
         // 해당 상품이 프로모션인가
         if (promotion == null) return
 
-
         println(storeProduct.canBuyQuantity(buyProduct.quantity))
         // 프로모션 재고가 있는가
         if (storeProduct.canBuyQuantity(buyProduct.quantity)) {
@@ -76,7 +75,15 @@ class BuyController(private val promotions: List<Promotion>, private var product
         membershipDiscount = (notPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).toInt()
     }
 
+    private fun buyProducts() {
+        buyList.forEach {
+            findProduct(it.name)?.buy(it.quantity)
+        }
+    }
+
     fun buyStart() {
+        outputView.printProducts(products)
+
         val buyInputList = inputView.readItem()
         buyList = buyInputList.mapNotNull { buyInput ->
             val product = findProduct(buyInput.name) ?: return@mapNotNull null
@@ -85,12 +92,14 @@ class BuyController(private val promotions: List<Promotion>, private var product
 
         calculateTotalPrice()
 
-        if(inputView.isMembership()){
+//        checkPromotions(buyList)
+
+        if (inputView.isMembership()) {
             checkMemberShip()
         }
 
-//        checkPromotions(buyList)
 
+        buyProducts()
 
         println(membershipDiscount)
         outputView.printReceipt(buyList, totalPrice, promotionDiscount, membershipDiscount)

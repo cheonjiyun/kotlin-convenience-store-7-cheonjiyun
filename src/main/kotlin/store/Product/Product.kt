@@ -31,8 +31,8 @@ class Product(private var name: String, private val price: Int, private var quan
     }
 
     private fun checkCanBuyQuantity(quantity: Int) {
-        if (canBuyQuantity(quantity)) {
-            throw IllegalStateException("재고 수량을 넘어갔습니다")
+        if (!canBuyQuantity(quantity)) {
+            throw IllegalStateException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.")
         }
     }
 }

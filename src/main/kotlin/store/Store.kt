@@ -12,13 +12,22 @@ class Store {
     private lateinit var promotions: List<Promotion>
 
     private fun getProducts(): List<Product> {
-        return readFile("products.md").map {
+        val resultProducts = readFile("products.md").map {
             val (name, price, quantity, promotionInput) = it
 
             Product(name, price.toInt(), quantity.toInt(), promotions.find { promotionItem ->
                 promotionItem.getName() == promotionInput
             })
+        }.toMutableList()
+
+        // 일반 상품이 없는 경우 추가
+        resultProducts.filter { product ->
+            resultProducts.find { it.getName() == product.getName() && it.getPromotion() == null } == null
+        }.forEach {
+            resultProducts.add(resultProducts.indexOf(it) + 1, Product(it.getName(), it.getPrice(), 0, null))
         }
+
+        return resultProducts.toList()
     }
 
     private fun getPromotion(): List<Promotion> {
