@@ -5,16 +5,18 @@ import store.Product.BuyProduct
 import store.Product.Product
 import store.Promotion.Promotion
 import store.View.InputView
+import store.View.OutputView
 
 
 val MEMBERSHIP_DISCOUNT_RATE = 0.3
 
 class BuyController(private val promotions: List<Promotion>, private var products: List<Product>) {
     private val inputView = InputView()
+    private val outputView = OutputView()
 
     private lateinit var buyList: List<BuyProduct>
     private var totalPrice = 0
-    private var promotionDiscount = 1000
+    private var promotionDiscount = 0
     private var membershipDiscount = 0
 
 
@@ -68,9 +70,10 @@ class BuyController(private val promotions: List<Promotion>, private var product
     }
 
     private fun checkMemberShip() {
-//        println(totalPrice - promotionDiscount)
-//
-//        membershipDiscount = ((totalPrice - promotionDiscount) * MEMBERSHIP_DISCOUNT_RATE).toInt()
+        val notPromotionPrice =
+            buyList.filter { it.promotion == null }.map { it.quantity * it.price }.reduce { acc, it -> acc + it }
+
+        membershipDiscount = (notPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).toInt()
     }
 
     fun buyStart() {
@@ -81,9 +84,15 @@ class BuyController(private val promotions: List<Promotion>, private var product
         }
 
         calculateTotalPrice()
-//
+
+        if(inputView.isMembership()){
+            checkMemberShip()
+        }
+
 //        checkPromotions(buyList)
-//        checkMemberShip()
-//        printReceipt()
+
+
+        println(membershipDiscount)
+        outputView.printReceipt(buyList, totalPrice, promotionDiscount, membershipDiscount)
     }
 }
