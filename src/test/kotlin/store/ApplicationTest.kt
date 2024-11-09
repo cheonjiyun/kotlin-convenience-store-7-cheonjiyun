@@ -84,6 +84,14 @@ class ApplicationTest : NsTest() {
     }
 
     @Test
+    fun `프로모션 혜택없이 일부 수량에 대해 정가로 결제한다`(){
+        assertNowTest({
+            run("[사이다-12]", "Y", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈8,000")
+        }, LocalDate.of(2024, 2, 1).atStartOfDay())
+    }
+
+    @Test
     fun `예외 테스트`() {
         assertSimpleTest {
             runException("[컵라면-12]", "N", "N")
