@@ -1,7 +1,6 @@
 package store.Promotion
 
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Date
 
 class Promotion(
@@ -41,7 +40,7 @@ class Promotion(
         return startDate < today && today < endDate
     }
 
-    fun howGetQuantity(quantity : Int): Int {
+    fun howGetQuantity(quantity: Int): Int {
         return (quantity / buy) * get
     }
 
