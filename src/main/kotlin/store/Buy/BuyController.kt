@@ -141,7 +141,9 @@ class BuyController(private val promotions: List<Promotion>, private var product
 
         if (notPromotionPrice == null) return
 
-        membershipDiscount = (notPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).toInt()
+
+        val discountPrice = (notPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).toInt()
+        membershipDiscount = if(discountPrice > 8000) 8000 else discountPrice
     }
 
     private fun buyProduct(buyProduct: BuyProduct) {
