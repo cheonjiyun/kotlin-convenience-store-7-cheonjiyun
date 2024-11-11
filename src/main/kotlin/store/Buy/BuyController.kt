@@ -42,7 +42,7 @@ class BuyController(private val promotions: List<Promotion>, private var product
 
     private fun checkRemoveNoPromotion(buyProduct: BuyProduct, storeProduct: Product) {
         if (!inputView.isBuyNotPromotion(buyProduct.name, buyProduct.quantity - storeProduct.getQuantity())) {
-            removeNoPromotion(buyProduct)
+//            removeNoPromotion(buyProduct)
         }
     }
 

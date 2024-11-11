@@ -15,7 +15,7 @@ class ProductTest {
 
     @Test
     fun `재고 수량보다 많은 수량을 구매하면, 예외가 발생한다`() {
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             val product = Product("상품이름", 3000, 10, null)
             product.buy(11)
         }
