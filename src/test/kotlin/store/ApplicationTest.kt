@@ -36,6 +36,14 @@ class ApplicationTest : NsTest() {
     }
 
     @Test
+    fun `일반 상품 한개 구매`() {
+        assertSimpleTest {
+            run("[비타민워터-3]", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈4,500")
+        }
+    }
+
+    @Test
     fun `여러 개의 일반 상품 구매`() {
         assertSimpleTest {
             run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "N")
@@ -44,10 +52,42 @@ class ApplicationTest : NsTest() {
     }
 
     @Test
+    fun `멤버십을 할인을 받는 여러 개의 일반 상품 구매`() {
+        assertSimpleTest {
+            run("[비타민워터-3],[물-2],[정식도시락-2]", "Y", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("멤버십할인-5,490", "내실돈12,810")
+        }
+    }
+
+    @Test
+    fun `프로모션 적용`() {
+        assertNowTest({
+            run("[사이다-8]", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈4,000")
+        }, LocalDate.of(2024, 2, 1).atStartOfDay())
+    }
+
+    @Test
     fun `기간에 해당하지 않는 프로모션 적용`() {
         assertNowTest({
             run("[감자칩-2]", "N", "N")
             assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈3,000")
+        }, LocalDate.of(2024, 2, 1).atStartOfDay())
+    }
+
+    @Test
+    fun `증정 가능하면 구매목록에 추가`(){
+        assertNowTest({
+            run("[콜라-5]", "Y", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("콜라6")
+        }, LocalDate.of(2024, 2, 1).atStartOfDay())
+    }
+
+    @Test
+    fun `프로모션 혜택없이 일부 수량에 대해 정가로 결제한다`(){
+        assertNowTest({
+            run("[사이다-12]", "Y", "N", "N")
+            assertThat(output().replace("\\s".toRegex(), "")).contains("내실돈8,000")
         }, LocalDate.of(2024, 2, 1).atStartOfDay())
     }
 
